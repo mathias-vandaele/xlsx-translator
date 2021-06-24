@@ -15,7 +15,7 @@ sem = threading.Semaphore(MAX_WORKERS)
 start = time.time()  
 client = translate.TranslationServiceClient()
 file_path = input("full path of the document to translate :")
-
+data_processed = 0
 #Writing to file
 wb_w = xlwt.Workbook()
 #Reading file
@@ -107,6 +107,7 @@ for name, sheet in wb_r.items():
 	data_feeder = executor.submit(feed_workers)
 	futures = []
 	bar_title = "'" + name + "' is being translated"
+	data_processed += sheet.size
 	pbar = tqdm(total=sheet.size, desc=bar_title , position=0, leave=True)
 	#Trying to find a wat to remove this sleep, the semaphore are not acquired yet in the data_feeder and data_spliter, must wait a small time before being sure it acquired them
 	time.sleep(0.1)
@@ -123,7 +124,7 @@ for name, sheet in wb_r.items():
 translated_filename = file_path.split('.')[0] + "_translated.xlsx"
 wb_w.save(translated_filename)
 end = time.time()
-print("took : " +  str(end - start) +  " second(s)")
+print("has processed : " + str(data_processed) + " datas in :" + str(end - start) +  " second(s)")
 
 
 
